@@ -41,10 +41,10 @@
 
 # Thanks to (In alphabetical order):
 
-   * @Pablito2020 (Adapted to krillin ,upstreamed and introducted new features to the kernel)
    * ANDR7E ( help with kpd buttons + device info app for mtk devices) ---- XDA, 4PDA, GITHUB
    * @assusdan help me with drivers and develop the kernel. ---- 4PDA, GITHUB
    * BQ for his sources (LCM DRVIERS, TOUCH DRIVERS, ETC) ---- GITHUB
+   * @Pablito2020 (Adapted to krillin ,upstreamed and introducted new features to the kernel)
    * Vineeth Raj for his dt2wake and sweep2wake commits for sprout. ---- GITHUB
    * Varun Chitre for his "thunder" drivers for sprout. ---- GITHUB
    * @zormax for the bring up LP/MM project ---- 4PDA
