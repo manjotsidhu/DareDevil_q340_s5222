@@ -41,6 +41,7 @@
 
 # Thanks to (In alphabetical order):
 
+   * @Pablito2020 (Adapted to krillin ,upstreamed and introducted new features to the kernel)
    * ANDR7E ( help with kpd buttons + device info app for mtk devices) ---- XDA, 4PDA, GITHUB
    * @assusdan help me with drivers and develop the kernel. ---- 4PDA, GITHUB
    * BQ for his sources (LCM DRVIERS, TOUCH DRIVERS, ETC) ---- GITHUB
