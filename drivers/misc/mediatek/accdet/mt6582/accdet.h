@@ -114,5 +114,3 @@ typedef enum
     TVOUT_STATUS_ERROR,
 } TVOUT_STATUS;
 */
-
-
