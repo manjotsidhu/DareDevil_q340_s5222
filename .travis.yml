@@ -1,0 +1,31 @@
+language: c
+
+#######################################################################################
+
+
+os:
+  - linux
+  
+addons:
+  apt:
+    packages:
+      - curl
+
+#######################################################################################
+
+
+before_install:
+
+  - sudo apt-get update -qq
+  
+  # downloading the latest version of the linaro toolchain. 
+  - git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-eabi-4.8 ~/arm-eabi-4.8/
+
+#######################################################################################
+
+
+script:  
+  - ./travis.sh 
+
+after_success:
+  - curl --upload-file arch/arm/boot/zImage https://transfer.sh/daredevil-manjot-.zip
