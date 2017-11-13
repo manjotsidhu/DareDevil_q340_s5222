@@ -88,6 +88,8 @@
 /* Battery Logging Entry */
 /* ////////////////////////////////////////////////////////////////////////////// */
 int Enable_BATDRV_LOG = BAT_LOG_CRTI;
+/* static struct proc_dir_entry *proc_entry; */
+char proc_bat_data[32];
 
 /* ///////////////////////////////////////////////////////////////////////////////////////// */
 /* // Smart Battery Structure */
@@ -276,7 +278,6 @@ static enum power_supply_property battery_props[] = {
 	POWER_SUPPLY_PROP_PRESENT,
 	POWER_SUPPLY_PROP_TECHNOLOGY,
 	POWER_SUPPLY_PROP_CAPACITY,
-	POWER_SUPPLY_PROP_VOLTAGE_NOW,
 	/* Add for Battery Service */
 	POWER_SUPPLY_PROP_batt_vol,
 	POWER_SUPPLY_PROP_batt_temp,
@@ -420,17 +421,15 @@ EXPORT_SYMBOL(wake_up_bat);
 
 static ssize_t bat_log_write(struct file *filp, const char __user *buff, size_t len, loff_t *data)
 {
-	char proc_bat_data;
-
-	if ((len <= 0) || copy_from_user(&proc_bat_data, buff, 1)) {
+	if (copy_from_user(&proc_bat_data, buff, len)) {
 		battery_xlog_printk(BAT_LOG_FULL, "bat_log_write error.\n");
 		return -EFAULT;
 	}
 
-	if (proc_bat_data == '1') {
+	if (proc_bat_data[0] == '1') {
 		battery_xlog_printk(BAT_LOG_CRTI, "enable battery driver log system\n");
 		Enable_BATDRV_LOG = 1;
-	} else if (proc_bat_data == '2') {
+	} else if (proc_bat_data[0] == '2') {
 		battery_xlog_printk(BAT_LOG_CRTI, "enable battery driver log system:2\n");
 		Enable_BATDRV_LOG = 2;
 	} else {
@@ -550,9 +549,6 @@ static int battery_get_property(struct power_supply *psy,
 		break;
 	case POWER_SUPPLY_PROP_CAPACITY:
 		val->intval = data->BAT_CAPACITY;
-		break;
-	case POWER_SUPPLY_PROP_VOLTAGE_NOW:
-		val->intval = data->BAT_batt_vol * 1000; /* uV */
 		break;
 	case POWER_SUPPLY_PROP_batt_vol:
 		val->intval = data->BAT_batt_vol;
@@ -2080,7 +2076,7 @@ void mt_battery_GetBatteryData(void)
 				      batteryIndex);
 
     
-	if (previous_SOC == -1 && bat_vol <= SYSTEM_OFF_VOLTAGE) {
+	if (previous_SOC == -1 && bat_vol <= V_0PERCENT_TRACKING) {
 		battery_xlog_printk(BAT_LOG_CRTI,
 				    "battery voltage too low, use ZCV to init average data.\n");
 		BMT_status.bat_vol =
@@ -4060,4 +4056,3 @@ module_exit(battery_exit);
 MODULE_AUTHOR("Oscar Liu");
 MODULE_DESCRIPTION("Battery Device Driver");
 MODULE_LICENSE("GPL");
- 
