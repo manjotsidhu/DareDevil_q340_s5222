@@ -28,7 +28,7 @@ orange='\033[0;33m'
 light_red='\033[1;31m'
 purple='\033[0;35m'
 ddv=1.0
-kv=3.10.107
+kv=3.10.108
 e=echo
 
 # Say info about the script in terminal
