@@ -2,7 +2,6 @@
 #ifndef __ALSPS_H__
 #define __ALSPS_H__
 
-#define MT6582
 
 #include <linux/wakelock.h>
 #include <linux/interrupt.h>
@@ -140,7 +139,8 @@ struct alsps_context {
 	bool 				is_ps_polling_run;
 	bool 				is_als_batch_enable;	//version2.this is used for judging whether sensor is in batch mode
 	bool 				is_ps_batch_enable;	//version2.this is used for judging whether sensor is in batch mode
-
+	bool 				is_get_valid_ps_data_after_enable;
+	bool 				is_get_valid_als_data_after_enable;
 };
 
 //AAL Functions

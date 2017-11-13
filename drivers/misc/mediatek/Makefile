@@ -141,6 +141,7 @@ obj-$(CONFIG_MTK_ECCCI_DRIVER) +=  eccci/
 obj-$(CONFIG_MTK_EEMCS_DRIVER) +=  eemcs/
 
 #obj-y	+= cam_cal/dummy_eeprom/
+obj-$(CONFIG_MTK_CAM_CAL_A5142OTP_SUPPORT) += cam_cal/a5142otp/
 obj-y	+= lens/
 obj-y	+= imgsensor/src/
 

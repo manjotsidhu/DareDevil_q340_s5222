@@ -39,6 +39,7 @@ extern struct alsps_context *alsps_context_obj;
 #define SET_TH			3
 #define GET_TH_RESULT 	4
 
-int alsps_factory_device_init();
+int alsps_factory_device_init(void);
 
 #endif
+

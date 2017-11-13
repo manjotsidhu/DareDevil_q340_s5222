@@ -422,8 +422,12 @@ config TOUCHSCREEN_MTK
 	  Say Y here if you have MediaTek touch panel.
 
 # Touch panel
-config MTK_FT5336
-        bool "FT5336 for Mediatek package"
+config MTK_EKTF2K
+        bool "MTK_EKTF2K for Mediatek package"
+        default n
+        
+config MTK_GOODIX9XX
+        bool "MTK_GOODIX9XX for Mediatek package"
         default n
 
 config TOUCHSCREEN_HP600

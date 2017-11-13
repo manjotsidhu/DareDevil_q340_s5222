@@ -966,18 +966,18 @@ config MTK_AUDIO_EXTCODEC_SUPPORT
 	  If you say Y, enable MTK_AUDIO_EXTCODEC_SUPPORT driver.
 
 # ALSPS sensor
- config MTK_CM36283
-	bool "CM36283 for MediaTek package"
-	default n
-
-config MTK_TMD2772_AUTO
-	bool "TMD2772 for MediaTek package"
+config MTK_AP3220
+	bool "MTK_AP3220 for MediaTek package"
 	default n
 		
 # Accelerometer sensor
-config MTK_LSM330
-	bool "MTK_LSM330 for MediaTek package"
-	default n
+config MTK_BMA222E_AUTO
+        bool "MTK_BMA222E_AUTO for MediaTek package"
+        default n
+
+config MTK_KXTJ2_1009_AUTO
+        bool "MTK_BMA250E for MediaTek package"
+        default n
 
 # Gyro sensor
 config MTK_L3GD20
@@ -1598,6 +1598,21 @@ config MTK_LENS_GAF008AF_SUPPORT
 	bool "GAF008AF Lens Driver"
 	default n
 
+config MTK_LENS_OV5648AF_DARLING_SUPPORT
+	bool "OV5648AF_DARLING Lens Driver"
+	default n
+
+config MTK_LENS_OV5648AF_DARLING_ZL_SUPPORT
+	bool "OV5648AF_DARLING_ZL Lens Driver"
+	default n
+
+config MTK_LENS_OV5648AF_SUNWIN_SUPPORT
+	bool "OV5648AF_SUNWIN Lens Driver"
+	default n
+
+config MTK_LENS_OV5648AF_TRULY_SUPPORT
+	bool "OV5648AF_TRULY Lens Driver"
+	default n
 #
 # Camera EEPROM Calibration
 #
@@ -1613,6 +1628,11 @@ config MTK_CAM_CAL_BRCC064GWZ_3_SUPPORT
 config MTK_CAM_CAL_BRCB032GWZ_3_SUPPORT
        bool "BRCB032GWZ_3 EEPROM Driver"
        default n
+
+config MTK_CAM_CAL_A5142OTP_SUPPORT
+       bool "A5142OTP EEPROM Driver"
+       default n
+
 #
 # MTK_EXTMEM for LCA project
 #

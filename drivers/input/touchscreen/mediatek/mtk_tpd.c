@@ -236,6 +236,8 @@ int tpd_driver_add(struct tpd_driver_t *tpd_drv)
 		tpd_driver_list[0].suspend = tpd_drv->suspend;
 		tpd_driver_list[0].resume = tpd_drv->resume;
 		tpd_driver_list[0].tpd_have_button = tpd_drv->tpd_have_button;
+		tpd_driver_list[0].tpd_get_fw_version = NULL;
+		tpd_driver_list[0].tpd_get_fw_vendor_name = NULL;
 		return 0;
 	}
 	for (i = 1; i < TP_DRV_MAX_COUNT; i++) {
@@ -247,6 +249,8 @@ int tpd_driver_add(struct tpd_driver_t *tpd_drv)
 			tpd_driver_list[i].resume = tpd_drv->resume;
 			tpd_driver_list[i].tpd_have_button = tpd_drv->tpd_have_button;
 			tpd_driver_list[i].attrs = tpd_drv->attrs;
+           		tpd_driver_list[i].tpd_get_fw_version = tpd_drv->tpd_get_fw_version;
+           		tpd_driver_list[i].tpd_get_fw_vendor_name = tpd_drv->tpd_get_fw_vendor_name;
 #if 0
 			if (tpd_drv->tpd_local_init() == 0) {
 				TPD_DMESG("load %s sucessfully\n",
@@ -281,6 +285,53 @@ int tpd_driver_remove(struct tpd_driver_t *tpd_drv)
 	return 0;
 }
 
+int tpd_fw_version = 0;
+char tpd_desc[50]={0};
+static ssize_t tpd_fw_version_show(struct device *dev,
+					struct device_attribute *attr,
+					char *buf)
+{
+    if( g_tpd_drv && g_tpd_drv->tpd_get_fw_version )
+    {
+        return sprintf(buf, "%x", g_tpd_drv->tpd_get_fw_version());
+    }
+
+    return 0;
+
+}
+static DEVICE_ATTR(tpd_fw_version, 0444, tpd_fw_version_show, NULL);
+
+static ssize_t tpd_fw_vendor_info_show(struct device *dev,
+					struct device_attribute *attr,
+					char *buf)
+{
+    char  vl_fw_vendor_name[256] ={ 0};
+
+    if( g_tpd_drv && g_tpd_drv->tpd_get_fw_vendor_name )
+    {
+        g_tpd_drv->tpd_get_fw_vendor_name(vl_fw_vendor_name);
+    }
+
+    return sprintf(buf, "%s", vl_fw_vendor_name);
+
+}
+static DEVICE_ATTR(tpd_fw_vendor_info, 0444, tpd_fw_vendor_info_show, NULL);
+
+
+static ssize_t tpd_fw_chip_info_show(struct device *dev,
+					struct device_attribute *attr,
+					char *buf)
+{
+    if( g_tpd_drv )
+    {
+	return sprintf(buf, "%s", g_tpd_drv->tpd_device_name);
+    }
+
+    return 0;
+    
+}
+static DEVICE_ATTR(tpd_fw_chip_info, 0444, tpd_fw_chip_info_show, NULL);
+
 static void tpd_create_attributes(struct device *dev, struct tpd_attrs *attrs)
 {
 	int num = attrs->num;
@@ -288,6 +339,37 @@ static void tpd_create_attributes(struct device *dev, struct tpd_attrs *attrs)
 	for (; num > 0;)
 		device_create_file(dev, attrs->attr[--num]);
 }
+
+//guomingyi20141121add.
+#ifdef TPD_DC_SYS_RESUME 
+static int tpd_dc_sys_resume = 0;
+int get_tpd_dc_sys_resume_status(void) 
+{
+	printk(TPD_DC_SYS_RESUME" tpd_dc_sys_resume : %d \n",tpd_dc_sys_resume);
+	return tpd_dc_sys_resume;
+}
+
+static ssize_t store_tpd_dc_sys_resume(struct device *dev,
+		struct device_attribute *attr, const char *buf, size_t size)
+{
+	if(buf != NULL && size != 0)
+	{
+		printk(TPD_DC_SYS_RESUME" buf is %s and size is %d \n",buf,size);
+		if(buf[0]== '0')
+		{
+			tpd_dc_sys_resume = 0;
+		}
+		else
+		{
+			tpd_dc_sys_resume = 1;
+		}
+	}
+	return size;
+}
+
+static DEVICE_ATTR(tpd_dc_sys_resume, 0777, NULL, store_tpd_dc_sys_resume);
+#endif
+//guomingyi20141121add.
 
 #ifdef CONFIG_TOUCHSCREEN_PREVENT_SLEEP
 
@@ -415,7 +497,6 @@ static int tpd_probe(struct platform_device *pdev)
 	tpd_mode_keypad_tolerance = TPD_RES_X * TPD_RES_X / 1600;
 	/* struct input_dev dev initialization and registration */
 	tpd->dev->name = TPD_DEVICE;
-	tpd->dev->hint_events_per_packet=33;
 	set_bit(EV_ABS, tpd->dev->evbit);
 	set_bit(EV_KEY, tpd->dev->evbit);
 	set_bit(ABS_X, tpd->dev->absbit);
@@ -546,12 +627,38 @@ static int tpd_probe(struct platform_device *pdev)
 
 	if (g_tpd_drv->attrs.num)
 		tpd_create_attributes(&pdev->dev, &g_tpd_drv->attrs);
+	if(device_create_file(&pdev->dev, &dev_attr_tpd_fw_version)) {
+		TPD_DMESG("create fw_version file error--Liu\n");
+	}
+	if(device_create_file(&pdev->dev, &dev_attr_tpd_fw_vendor_info)) {
+		TPD_DMESG("create touch_info file error--Liu\n");
+	}
+	if(device_create_file(&pdev->dev, &dev_attr_tpd_fw_chip_info)) {
+		TPD_DMESG("create touch_info file error--Liu\n");
+	}
 
-	return 0;
+//guomingyi20141121add.
+#ifdef TPD_DC_SYS_RESUME
+	if(device_create_file(&pdev->dev, &dev_attr_tpd_dc_sys_resume)) {
+		TPD_DMESG("create tpd_dc_sys_resume file error--Liu\n");
+	}
+#endif
+//guomingyi20141121add.
+
+    return 0;
 }
 
 static int tpd_remove(struct platform_device *pdev)
 {
+    device_remove_file(&pdev->dev, &dev_attr_tpd_fw_chip_info);
+    device_remove_file(&pdev->dev, &dev_attr_tpd_fw_vendor_info);
+    device_remove_file(&pdev->dev, &dev_attr_tpd_fw_version);
+
+//guomingyi20141121add.
+#ifdef TPD_DC_SYS_RESUME
+	device_remove_file(&pdev->dev, &dev_attr_tpd_dc_sys_resume);
+#endif
+//guomingyi20141121add.
 	input_unregister_device(tpd->dev);
 #ifdef CONFIG_HAS_EARLYSUSPEND
 	unregister_early_suspend(&MTK_TS_early_suspend_handler);

@@ -1449,11 +1449,11 @@ static struct platform_device actuator_dev = {
 	.name		  = "lens_actuator",
 	.id		  = -1,
 };
-static struct platform_device actuator_dev2 = {
-	.name		  = "lens_actuator2",
-	.id		  = -1,
+//BEGIN<><DATE20131128><add the lens of fm50af2> panzaoyan
+static struct platform_device actuator_dev2Darling = {
+	.name		  = "lens_actuator2Darling",
+  	.id		  = -1,
 };
-
 /*=======================================================================*/
 /* MT6575 jogball                                                        */
 /*=======================================================================*/
@@ -2119,7 +2119,7 @@ retval = platform_device_register(&dummychar_device);
     }
 #endif
 #if 1  //defined(CONFIG_ACTUATOR)
-    retval = platform_device_register(&actuator_dev2);
+    retval = platform_device_register(&actuator_dev2Darling);
     if (retval != 0){
         return retval;
     }

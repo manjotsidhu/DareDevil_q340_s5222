@@ -1,4 +1,7 @@
 #include "tpd.h"
+/* #ifdef TPD_HAVE_CALIBRATION */
+
+/* #ifndef TPD_CUSTOM_CALIBRATION */
 
 /* #if (defined(TPD_WARP_START) && defined(TPD_WARP_END)) */
 /* #define TPD_DO_WARP */
@@ -35,6 +38,10 @@ void tpd_warp_calibrate(int *x, int *y)
 	*x = wx, *y = wy;
 }
 
+/* #else */
+/* #define tpd_warp_calibrate(x,y) */
+/* #endif */
+
 void tpd_calibrate(int *x, int *y)
 {
 	int tx, i;
@@ -51,3 +58,7 @@ void tpd_calibrate(int *x, int *y)
 	*x = (*x) + ((*y) * (*x) * tpd_calmat[6] / TPD_RES_X) / TPD_RES_Y;
 	*y = (*y) + ((*y) * (*x) * tpd_calmat[7] / TPD_RES_X) / TPD_RES_Y;
 }
+
+/* #endif */
+
+/* #endif */

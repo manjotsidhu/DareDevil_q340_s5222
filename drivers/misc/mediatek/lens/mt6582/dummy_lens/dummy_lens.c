@@ -15,7 +15,7 @@
 
 /* #define DUMMY_LENS_DEBUG */
 #ifdef DUMMY_LENS_DEBUG
-#define DUMMY_LENSDB pr_debug
+#define DUMMY_LENSDB printk
 #else
 #define DUMMY_LENSDB(x, ...)
 #endif

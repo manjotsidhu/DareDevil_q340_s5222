@@ -2,6 +2,7 @@
 #include "alsps.h"
 #include "aal_control.h"
 struct alsps_context *alsps_context_obj = NULL;
+struct platform_device *pltfm_dev;
 
 
 static struct alsps_init_info* alsps_init_list[MAX_CHOOSE_ALSPS_NUM]= {0}; //modified
@@ -11,7 +12,14 @@ static void alsps_late_resume(struct early_suspend *h);
 
 int als_data_report(struct input_dev *dev, int value, int status)
 {
+	struct alsps_context *cxt = NULL;
+	cxt  = alsps_context_obj;
 	//ALSPS_LOG("+als_data_report! %d, %d\n",value,status);
+	if (cxt->is_get_valid_als_data_after_enable == false)
+	{
+		input_report_abs(dev, EVENT_TYPE_ALS_VALUE, value+1);
+		cxt->is_get_valid_als_data_after_enable = true;
+	}
   	input_report_abs(dev, EVENT_TYPE_ALS_VALUE, value);
 	input_report_abs(dev, EVENT_TYPE_ALS_STATUS, status);
 	input_sync(dev);
@@ -151,6 +159,11 @@ static void ps_work_func(struct work_struct *work)
 			
 	    }
 	}
+    if (cxt->is_get_valid_ps_data_after_enable == false)
+    {
+        if(ALSPS_INVALID_VALUE != cxt->drv_data.als_data.values[0])
+            cxt->is_get_valid_ps_data_after_enable = true;
+    }
 	//report data to input device
 	//printk("new alsps work run....\n");
 	//ALSPS_LOG("ps data[%d]  \n" ,cxt->drv_data.ps_data.values[0]);
@@ -162,6 +175,7 @@ static void ps_work_func(struct work_struct *work)
 	ps_loop:
 	if(true == cxt->is_ps_polling_run)
 	{
+		if (cxt->ps_ctl.is_polling_mode || (cxt->is_get_valid_ps_data_after_enable == false))
 		{
 		  mod_timer(&cxt->timer_ps, jiffies + atomic_read(&cxt->delay_ps)/(1000/HZ)); 
 		}
@@ -183,7 +197,7 @@ static void ps_poll(unsigned long data)
 	struct alsps_context *obj = (struct alsps_context *)data;
 	if(obj != NULL)
 	{
-        if(obj->ps_ctl.is_polling_mode)
+        //if(obj->ps_ctl.is_polling_mode)
 		schedule_work(&obj->report_ps);
 	}
 }
@@ -291,6 +305,7 @@ static int als_enable_data(int enable)
 	   	{
 	      		if(false == cxt->als_ctl.is_report_input_direct)
 	      		{
+                        cxt->is_get_valid_als_data_after_enable = false;
 	      			mod_timer(&cxt->timer_als, jiffies + atomic_read(&cxt->delay_als)/(1000/HZ));
 		  		cxt->is_als_polling_run = true;
 	      		}
@@ -383,6 +398,7 @@ static int ps_enable_data(int enable)
 	      		{
 	      			mod_timer(&cxt->timer_ps, jiffies + atomic_read(&cxt->delay_ps)/(1000/HZ));
 		  		cxt->is_ps_polling_run = true;
+	      			cxt->is_get_valid_ps_data_after_enable = false;
 	      		}
 	   	}
     	}
@@ -519,6 +535,7 @@ static ssize_t als_store_batch(struct device* dev, struct device_attribute *attr
                 {
                     if(false == cxt->als_ctl.is_report_input_direct)
                     {
+                        cxt->is_get_valid_als_data_after_enable = false;
                         mod_timer(&cxt->timer_als, jiffies + atomic_read(&cxt->delay_als)/(1000/HZ));
                         cxt->is_als_polling_run = true;
                     }
@@ -679,6 +696,7 @@ static ssize_t ps_store_batch(struct device* dev, struct device_attribute *attr,
                     {
                         mod_timer(&cxt->timer_ps, jiffies + atomic_read(&cxt->delay_ps)/(1000/HZ));
                         cxt->is_ps_polling_run = true;
+                        cxt->is_get_valid_ps_data_after_enable = false;
                     }
                 }
 	    	}
@@ -755,7 +773,7 @@ static struct platform_driver als_ps_driver = {
 	}
 };
 
-static int alsps_real_driver_init(void) 
+static int alsps_real_driver_init() 
 {
     int i =0;
 	int err=0;
@@ -783,12 +801,10 @@ static int alsps_real_driver_init(void)
 	return err;
 }
 
-#define DEFAULT_ALSPS_NAME "cktps"
   int alsps_driver_add(struct alsps_init_info* obj) 
 {
     int err=0;
 	int i =0;
-	int currentindex=0;
 	
 	ALSPS_FUN();
 	if (!obj) {
@@ -810,28 +826,9 @@ static int alsps_real_driver_init(void)
 	    {
 	      obj->platform_diver_addr = &als_ps_driver;
 	      alsps_init_list[i] = obj;
-		  currentindex=i;
 		  break;
 	    }
 	}
-
-	for(i=currentindex;i>=0;i--)
-	{
-		char * name =alsps_init_list[i]->name;
-		if(0 ==  strcmp(name,DEFAULT_ALSPS_NAME) )
-		{
-			struct alsps_init_info *temp;
-			if(i !=currentindex)
-			{
-				// 交换cktps到最后,之前的顺序无所谓 苏 勇 2014年12月18日 10:39:01
-		 		temp=alsps_init_list[i];
-		 		alsps_init_list[i]=alsps_init_list[currentindex];
-				alsps_init_list[currentindex]=temp;
-			}
-			break;
-		}
-	}
-	
 	if(i >= MAX_CHOOSE_ALSPS_NUM)
 	{
 	   ALSPS_ERR("ALSPS driver add err \n");
@@ -841,12 +838,28 @@ static int alsps_real_driver_init(void)
 	return err;
 }
 EXPORT_SYMBOL_GPL(alsps_driver_add);
+struct platform_device *get_alsps_platformdev() 
+{
+    return pltfm_dev;
+}
 
 int ps_report_interrupt_data(int value) 
 {
 	struct alsps_context *cxt = NULL;
 	//int err =0;
 	cxt = alsps_context_obj;	
+    if (cxt->is_get_valid_ps_data_after_enable == false)
+    {
+        if(ALSPS_INVALID_VALUE != value)
+        {
+            cxt->is_get_valid_ps_data_after_enable = true;
+            smp_mb();
+            del_timer_sync(&cxt->timer_ps);
+            smp_mb();
+            cancel_work_sync(&cxt->report_ps);
+        }
+    }
+    if (cxt->is_ps_batch_enable == false)
 	ps_data_report(cxt->idev,value,3);
 	
 	return 0;
@@ -1009,7 +1022,6 @@ int als_register_control_path(struct als_control_path *ctl)
 int ps_register_control_path(struct ps_control_path *ctl)
 {
 	struct alsps_context *cxt = NULL;
-	int err =0;
 	cxt = alsps_context_obj;
 	cxt->ps_ctl.set_delay = ctl->set_delay;
 	cxt->ps_ctl.open_report_data= ctl->open_report_data;
@@ -1114,6 +1126,7 @@ static int alsps_probe(struct platform_device *pdev)
 
 	int err;
 	ALSPS_LOG("+++++++++++++alsps_probe!!\n");
+	pltfm_dev= pdev;
 
 	alsps_context_obj = alsps_context_alloc_object();
 	if (!alsps_context_obj)
@@ -1145,7 +1158,7 @@ static int alsps_probe(struct platform_device *pdev)
 		goto exit_alloc_input_dev_failed;
 	}
 
-#if defined(CONFIG_HAS_EARLYSUSPEND)
+#if defined(CONFIG_HAS_EARLYSUSPEND) && defined(CONFIG_EARLYSUSPEND)
     atomic_set(&(alsps_context_obj->early_suspend), 0);
 	alsps_context_obj->early_drv.level    = EARLY_SUSPEND_LEVEL_STOP_DRAWING - 1,
 	alsps_context_obj->early_drv.suspend  = alsps_early_suspend,

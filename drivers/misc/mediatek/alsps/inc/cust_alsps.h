@@ -38,5 +38,6 @@ struct alsps_hw {
 
 extern struct alsps_hw* get_cust_alsps_hw(void);
 
+ struct alsps_hw* get_alsps_dts_func(const char *, struct alsps_hw*);
 __weak int pmic_ldo_suspend_enable(int enable);
 #endif

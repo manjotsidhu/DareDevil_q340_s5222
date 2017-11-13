@@ -26,6 +26,7 @@
 #include <generated/autoconf.h>
 #include <linux/kobject.h>
 #include <linux/earlysuspend.h>
+/* #include "tpd_custom.h" */
 
 /* debug macros */
 /* //#define TPD_DEBUG */
@@ -100,6 +101,9 @@ struct tpd_driver_t {
 	void (*resume) (struct early_suspend *h);
 	int tpd_have_button;
 	struct tpd_attrs attrs;
+	int (*tpd_get_fw_version)(void);
+    void (*tpd_get_fw_vendor_name)(char * fw_vendor_name);	
+	
 };
 
 struct tpd_filter_t
