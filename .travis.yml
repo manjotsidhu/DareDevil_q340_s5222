@@ -28,4 +28,7 @@ script:
   - ./travis.sh 
 
 after_success:
-  - curl --upload-file arch/arm/boot/zImage https://transfer.sh/daredevil-manjot-.zip
+  - cp arch/arm/boot/zImage tools/zImage
+  - cd tools && chmod a+x mkimage
+  - ./mkimage zImage KERNEL > zImage_with_header
+  - curl --upload-file zImage_with_header https://transfer.sh/daredevil
