@@ -1001,6 +1001,10 @@ config MTK_MMC3516X_AUTO
 	bool "MMC3516X_AUTO for MediaTek package"
 	default n
 
+config MTK_AKM09911_NEW
+	bool "MTK_AKM09911_NEW for MediaTek package"
+	default n
+
 # Barometer sensor
 config MTK_BMP180_NEW
 	bool "BMP180 for MediaTek package"
