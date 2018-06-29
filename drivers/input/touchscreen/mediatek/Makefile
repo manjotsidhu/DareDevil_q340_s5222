@@ -121,3 +121,10 @@ ifeq ($(CONFIG_MTK_EKTF2K),y)
 obj-y	+=  ektf2k/
 endif
 
+ifeq ($(CONFIG_MTK_GT9XX_S5222),y)
+obj-y	+=  GT9XX_S5222/
+endif
+
+ifeq ($(CONFIG_MTK_EKTF2K_S5222),y)
+obj-y	+=  ektf2k_s5222/
+endif
