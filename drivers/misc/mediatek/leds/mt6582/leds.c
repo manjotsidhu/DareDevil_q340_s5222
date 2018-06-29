@@ -36,6 +36,10 @@
 //#include <linux/leds_sw.h>
 //#include <mach/mt_pmic_feature_api.h>
 //#include <mach/mt_boot.h>
+#include "lcd_drv.h"
+#include "lcm_drv.h"
+#include "dpi_drv.h"
+#include "dsi_drv.h"
 
 
 static DEFINE_MUTEX(leds_mutex);
@@ -310,7 +314,11 @@ int mt_led_blink_pmic(enum mt65xx_led_pmic pmic_type, struct nled_setting* led) 
 			upmu_set_rg_isink0_ck_pdn(0);
 			upmu_set_rg_isink0_ck_sel(0);
 			upmu_set_isink_ch0_mode(PMIC_PWM_0);
-			upmu_set_isink_ch0_step(0x3);//16mA
+                                        #ifdef CONFIG_PROJECT_S4800AP
+			upmu_set_isink_ch0_step(0x0);//0x0=4mA
+			#else
+			upmu_set_isink_ch0_step(0x3);//0x3=16mA
+			#endif
 			upmu_set_isink_dim0_duty(duty);
 			upmu_set_isink_dim0_fsel(pmic_freqsel_array[time_index]);
 			upmu_set_isink_breath0_trf_sel(0x0);
@@ -322,7 +330,11 @@ int mt_led_blink_pmic(enum mt65xx_led_pmic pmic_type, struct nled_setting* led) 
 			upmu_set_rg_isink1_ck_pdn(0);
 			upmu_set_rg_isink1_ck_sel(0);
 			upmu_set_isink_ch1_mode(PMIC_PWM_0);
-			upmu_set_isink_ch1_step(0x3);//16mA
+                                        #ifdef CONFIG_PROJECT_S4800AP
+			upmu_set_isink_ch1_step(0x0);//0x0=4mA
+			#else
+			upmu_set_isink_ch1_step(0x3);//0x3=16mA
+			#endif
 			upmu_set_isink_dim1_duty(duty);
 			upmu_set_isink_dim1_fsel(pmic_freqsel_array[time_index]);
 			upmu_set_isink_breath1_trf_sel(0x0);
@@ -347,6 +359,15 @@ int mt_led_blink_pmic(enum mt65xx_led_pmic pmic_type, struct nled_setting* led) 
 			upmu_set_rg_isink3_ck_sel(0);
 			upmu_set_isink_ch3_mode(PMIC_PWM_0);
 			upmu_set_isink_ch3_step(0x3);//16mA
+		//guomingyi20141219 for buttom-led current add start.
+		#ifdef CONFIG_PROJECT_S4710
+			upmu_set_rg_drv_32k_ck_pdn(0x0); // Disable power down  
+			upmu_set_rg_isink3_double_en(0x1);
+			upmu_set_isink_phase3_dly_en(0x1); // Enable phase delay
+			upmu_set_isink_chop3_en(0x1); // Enable CHOP clk  
+			printk("##mt_led_blink_pmict222 :upmu_set_isink_ch3_step: 16mA\n");
+		#endif
+		//guomingyi20141219 for buttom-led current add end.
 			upmu_set_isink_dim3_duty(duty);
 			upmu_set_isink_dim3_fsel(pmic_freqsel_array[time_index]);
 			upmu_set_isink_breath3_trf_sel(0x0);
@@ -697,7 +718,11 @@ int mt_brightness_set_pmic(enum mt65xx_led_pmic pmic_type, u32 level, u32 div)
 				upmu_set_rg_isink0_ck_pdn(0);
 				upmu_set_rg_isink0_ck_sel(0);
 				upmu_set_isink_ch0_mode(PMIC_PWM_0);
-				upmu_set_isink_ch0_step(0x3);//16mA
+                                                     #ifdef CONFIG_PROJECT_S4800AP
+				upmu_set_isink_ch0_step(0x0);//0x0=4mA 0x3=16mA
+				#else
+                                                     upmu_set_isink_ch0_step(0x3);//0x0=4mA 0x3=16mA
+                                                     #endif
 				//hwPWMsetting(PMIC_PWM_1, 15, 8);
 				upmu_set_isink_dim0_duty(15);
 				upmu_set_isink_dim0_fsel(0);//6323 1KHz
@@ -732,7 +757,11 @@ int mt_brightness_set_pmic(enum mt65xx_led_pmic pmic_type, u32 level, u32 div)
 				upmu_set_rg_isink1_ck_pdn(0);
 				upmu_set_rg_isink1_ck_sel(0);
 				upmu_set_isink_ch1_mode(PMIC_PWM_0);
-				upmu_set_isink_ch1_step(0x3);//16mA
+                                                     #ifdef CONFIG_PROJECT_S4800AP 
+				upmu_set_isink_ch1_step(0x0);//0x0=4mA 0x3=16mA
+				#else
+                                                      upmu_set_isink_ch1_step(0x3);//0x0=4mA 0x3=16mA
+				#endif
 				//hwPWMsetting(PMIC_PWM_2, 15, 8);
 				upmu_set_isink_dim1_duty(15);
 				upmu_set_isink_dim1_fsel(0);//6323 1KHz
@@ -805,7 +834,20 @@ int mt_brightness_set_pmic(enum mt65xx_led_pmic pmic_type, u32 level, u32 div)
 				upmu_set_rg_isink3_ck_pdn(0);
 				upmu_set_rg_isink3_ck_sel(0);
 				upmu_set_isink_ch3_mode(PMIC_PWM_0);
+				
+			#ifdef CONFIG_PROJECT_S5222
+				upmu_set_isink_ch3_step(0x5);//24mA
+			#else
 				upmu_set_isink_ch3_step(0x3);//16mA
+			#endif
+			//guomingyi20141219 for buttom-led current add start.
+			#ifdef CONFIG_PROJECT_S4710
+				upmu_set_rg_isink3_double_en(0x1);
+				upmu_set_isink_phase3_dly_en(0x1); // Enable phase delay
+				upmu_set_isink_chop3_en(0x1); // Enable CHOP clk  
+				printk("######mt_led_blink_pmict111 :upmu_set_isink_ch3_step: 16mA\n");
+			#endif
+			//guomingyi20141219 for buttom-led current add end.
 				//hwPWMsetting(PMIC_PWM_1, 15, 8);
 				upmu_set_isink_dim3_duty(15);
 				upmu_set_isink_dim3_fsel(0);//6323 1KHz
@@ -879,6 +921,10 @@ int mt_brightness_set_pmic_duty_store(u32 level, u32 div)
 {
 	return -1;
 }
+
+
+extern LCM_DRIVER *lcm_drv;//zhangdongfang add 20150519
+
 int mt_mt65xx_led_set_cust(struct cust_mt65xx_led *cust, int level)
 {
 	struct nled_setting led_tmp_setting = {0,0,0};
@@ -943,6 +989,13 @@ int mt_mt65xx_led_set_cust(struct cust_mt65xx_led *cust, int level)
 			return ((cust_set_brightness)(cust->data))(level);
               
 		case MT65XX_LED_MODE_PMIC:
+			#ifdef CONFIG_TINNO_S8813LED       // Added by dengyanjun
+			if(cust->data == MT65XX_LED_PMIC_NLED_ISINK2)
+			{
+			        LEDS_DEBUG("[S8813AA]  brightness_set_cust mt6582 aaaa\n");
+				return 1;
+			}
+			#endif 
 			//for button baclight used SINK channel, when set button ISINK, don't do disable other ISINK channel
 			if((strcmp(cust->name,"button-backlight") == 0)) {
 				if(button_flag==false) {
@@ -977,6 +1030,20 @@ int mt_mt65xx_led_set_cust(struct cust_mt65xx_led *cust, int level)
 
 		
 		case MT65XX_LED_MODE_CUST_BLS_PWM:
+			LEDS_DEBUG("[S8813AA]  brightness_set_cust MT65XX_LED_MODE_CUST_BLS_PWM \n");
+			#ifdef CONFIG_TINNO_S8813LED       // Added by dengyanjun
+				button_flag_isink2 = 1;//Ctrl LED
+				LEDS_DEBUG("[S8813AA]  brightness_set_cust MT65XX_LED_MODE_CUST_BLS_PWM 2222 \n");
+				mt_brightness_set_pmic(MT65XX_LED_PMIC_NLED_ISINK2, level, bl_div_hal);
+			#endif 
+			#if defined(CONFIG_PROJECT_S5222)
+			if((strcmp(lcm_drv->name,"ili9806e_fwvga_dsi_vdo_tcl") == 0))
+			{
+				if(level <= 70)
+					level = 70;
+			}
+			#endif
+			
 			if(strcmp(cust->name,"lcd-backlight") == 0)
 			{
 				bl_brightness_hal = level;

@@ -230,7 +230,86 @@ static const char fsg_string_interface[] = "Mass Storage";
 
 #include "storage_common.c"
 
+#if defined(PROJECT_RIO_LITE_2)
+#define PRODUCT_NAME "MyPhone"
+#define MASS_NAME "mass stroage"
 
+#elif defined(CONFIG_PROJECT_S4710_MMX)
+#define PRODUCT_NAME "Micromax Q372"
+#define MASS_NAME "File-CD Gadget"
+
+#elif defined(CONFIG_PROJECT_S4700_MMX_IN)
+#define PRODUCT_NAME "Micromax A106"
+#define MASS_NAME "File-CD Gadget"
+
+#elif defined(CONFIG_PROJECT_S5301_MMX_IN)
+#define PRODUCT_NAME "Micromax Q355"
+#define MASS_NAME "File-CD Gadget"
+
+#elif defined(CONFIG_PROJECT_S5222_MMX_IN)
+#define PRODUCT_NAME "Micromax Q340"
+#define MASS_NAME "File-CD Gadget"
+
+#elif defined(CONFIG_PROJECT_S5400_MMX_IN)
+#define PRODUCT_NAME "Micromax Q345"
+#define MASS_NAME "File-CD Gadget"
+
+#elif defined(CONFIG_PROJECT_S4710_PK)
+#define PRODUCT_NAME "QMobile i8 "
+#define MASS_NAME "File-CD Gadget"
+
+#elif defined(CONFIG_PROJECT_S4800_PK)
+#define PRODUCT_NAME "QMobile S5"
+#define MASS_NAME "File-CD Gadget"
+
+#elif defined(CONFIG_PROJECT_S5222_PK)
+#define PRODUCT_NAME "QMobile S1"
+#define MASS_NAME "File-CD Gadget"
+
+#elif defined(CONFIG_PROJECT_S5400AP_PK)
+#define PRODUCT_NAME "QMobile L15"
+#define MASS_NAME "File-CD Gadget"
+
+#elif defined(CONFIG_PROJECT_S5400_WIK_FR)
+#define PRODUCT_NAME "RAINBOW UP"
+#define MASS_NAME "File-CD Gadget"
+
+#elif defined(CONFIG_PROJECT_S4800_WIK_FR)
+#define PRODUCT_NAME "SELFY"
+#define MASS_NAME "File-CD Gadget"
+
+#elif defined(CONFIG_PROJECT_S5222_WIK_FR)
+#define PRODUCT_NAME "RAINBOW LITE"
+#define MASS_NAME "File-CD Gadget"
+
+#elif defined(CONFIG_PROJECT_S5501_WIK_FR)
+#define PRODUCT_NAME "RAINBOW"
+#define MASS_NAME "File-CD Gadget"
+
+#elif defined(CONFIG_PROJECT_S8813_CAS_TR)
+#define PRODUCT_NAME "Casper_VIA_V5"
+#define MASS_NAME "File-CD Gadget"
+
+#elif defined(CONFIG_PROJECT_S5400_CAS_TR)
+#define PRODUCT_NAME "Casper_VIA_V3"
+#define MASS_NAME "File-CD Gadget"
+
+#elif defined(CONFIG_PROJECT_S5400_WIK_ID)
+#define PRODUCT_NAME "RAINBOW UP"
+#define MASS_NAME "File-CD Gadget"
+
+#elif defined(PROJECT_RIO_2_FUN)
+#define PRODUCT_NAME "MyPhone"
+#define MASS_NAME "Mass Storage"
+
+#elif defined(PROJECT_RIO_PIXIE)
+#define PRODUCT_NAME "MyPhone"
+#define MASS_NAME "Mass Storage"
+
+#else
+#define PRODUCT_NAME "Linux"
+#define MASS_NAME "File-CD Gadget"
+#endif
 /*-------------------------------------------------------------------------*/
 
 struct fsg_dev;
@@ -2811,14 +2890,24 @@ buffhds_first_it:
 
 	/* Prepare inquiryString */
 	i = get_default_bcdDevice();
+#if defined(CONFIG_PROJECT_S8813_CAS_TR) || defined(CONFIG_PROJECT_S5400_CAS_TR)
+	/*rong.wang modify cas_tr usb string*/
 	snprintf(common->inquiry_string, sizeof common->inquiry_string,
 		 "%-8s%-16s%04x", cfg->vendor_name ?: "Linux",
 		 /* Assume product name dependent on the first LUN */
 		 cfg->product_name ?: (common->luns->cdrom
 				     ? "File-Stor Gadget"
-				     : "File-CD Gadget"),
+				     : PRODUCT_NAME),
 		 i);
-
+#else
+	snprintf(common->inquiry_string, sizeof common->inquiry_string,
+		 "%-8s%-16s%04x", cfg->vendor_name ?: PRODUCT_NAME,
+		 /* Assume product name dependent on the first LUN */
+		 cfg->product_name ?: (common->luns->cdrom
+				     ? "File-Stor Gadget"
+				     : MASS_NAME),
+		 i);
+#endif
 	/*
 	 * Some peripheral controllers are known not to be able to
 	 * halt bulk endpoints correctly.  If one of them is present,

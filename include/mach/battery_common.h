@@ -10,7 +10,15 @@
  *  BATTERY VOLTAGE
  ****************************************************************************/
 #define PRE_CHARGE_VOLTAGE                  3200
+
+#if defined(CONFIG_PROJECT_S4710_MMX) || defined(CONFIG_PROJECT_S5301_MMX_IN) || defined(CONFIG_PROJECT_S4700_MMX_IN) \
+     || defined(CONFIG_PROJECT_S4800_MMX_IN)
+#define SYSTEM_OFF_VOLTAGE                  3350
+#elif defined(CONFIG_PROJECT_S5400_MMX_IN)
+#define SYSTEM_OFF_VOLTAGE                  3300
+#else
 #define SYSTEM_OFF_VOLTAGE                  3400
+#endif
 #define CONSTANT_CURRENT_CHARGE_VOLTAGE     4100
 #define CONSTANT_VOLTAGE_CHARGE_VOLTAGE     4200
 #define CV_DROPDOWN_VOLTAGE                 4000
@@ -102,18 +110,77 @@ typedef enum {
 	TEMP_ABOVE_POS_60
 } temp_state_enum;
 
+#if defined(CONFIG_PROJECT_S5400) || defined(CONFIG_PROJECT_S5301)  || defined(CONFIG_PROJECT_S4800)|| defined(CONFIG_PROJECT_S5222)
 
-#define TEMP_POS_60_THRESHOLD  50
-#define TEMP_POS_60_THRES_MINUS_X_DEGREE 47
+#if defined(CONFIG_PROJECT_S5400_MMX_IN)
+#define TEMP_POS_60_THRESHOLD  	58
+#define TEMP_POS_60_THRES_MINUS_X_DEGREE  57
+#elif defined(CONFIG_PROJECT_S4800_MMX_IN)
+#define TEMP_POS_60_THRESHOLD  	60
+#define TEMP_POS_60_THRES_MINUS_X_DEGREE  54
+#else
+#define TEMP_POS_60_THRESHOLD          60
+#define TEMP_POS_60_THRES_MINUS_X_DEGREE  58
+#endif
 
 #define TEMP_POS_45_THRESHOLD  45
-#define TEMP_POS_45_THRES_MINUS_X_DEGREE 39
+#define TEMP_POS_45_THRES_MINUS_X_DEGREE 43
 
 #define TEMP_POS_10_THRESHOLD  10
-#define TEMP_POS_10_THRES_PLUS_X_DEGREE 16
+#define TEMP_POS_10_THRES_PLUS_X_DEGREE 12
 
 #define TEMP_POS_0_THRESHOLD  0
-#define TEMP_POS_0_THRES_PLUS_X_DEGREE 6
+#define TEMP_POS_0_THRES_PLUS_X_DEGREE 2
+
+#ifdef CONFIG_MTK_FAN5405_SUPPORT
+#define TEMP_NEG_10_THRESHOLD  0
+#define TEMP_NEG_10_THRES_PLUS_X_DEGREE  0
+#elif defined(CONFIG_MTK_BQ24158_SUPPORT)
+#define TEMP_NEG_10_THRESHOLD  0
+#define TEMP_NEG_10_THRES_PLUS_X_DEGREE  0
+#else
+#define TEMP_NEG_10_THRESHOLD  0
+#define TEMP_NEG_10_THRES_PLUS_X_DEGREE  2
+#endif
+
+#elif defined(CONFIG_PROJECT_S4700)
+
+#define TEMP_POS_60_THRESHOLD  60
+#define TEMP_POS_60_THRES_MINUS_X_DEGREE 58	//57
+
+#define TEMP_POS_45_THRESHOLD  45
+#define TEMP_POS_45_THRES_MINUS_X_DEGREE 43	//40
+
+#define TEMP_POS_10_THRESHOLD  15
+#define TEMP_POS_10_THRES_PLUS_X_DEGREE 17
+
+#define TEMP_POS_0_THRESHOLD  0
+#define TEMP_POS_0_THRES_PLUS_X_DEGREE 2	//5
+
+#ifdef MTK_FAN5405_SUPPORT
+#define TEMP_NEG_10_THRESHOLD  0
+#define TEMP_NEG_10_THRES_PLUS_X_DEGREE  0
+#elif defined( MTK_BQ24158_SUPPORT)
+#define TEMP_NEG_10_THRESHOLD  0
+#define TEMP_NEG_10_THRES_PLUS_X_DEGREE  0
+#else
+#define TEMP_NEG_10_THRESHOLD  0
+#define TEMP_NEG_10_THRES_PLUS_X_DEGREE  0
+#endif
+
+#elif defined(CONFIG_PROJECT_S5301_MMX_IN)
+
+#define TEMP_POS_60_THRESHOLD  	58
+#define TEMP_POS_60_THRES_MINUS_X_DEGREE  57
+
+#define TEMP_POS_45_THRESHOLD  45
+#define TEMP_POS_45_THRES_MINUS_X_DEGREE 43
+
+#define TEMP_POS_10_THRESHOLD  10
+#define TEMP_POS_10_THRES_PLUS_X_DEGREE 12
+
+#define TEMP_POS_0_THRESHOLD  0
+#define TEMP_POS_0_THRES_PLUS_X_DEGREE 2
 
 #ifdef CONFIG_MTK_FAN5405_SUPPORT
 #define TEMP_NEG_10_THRESHOLD  0
@@ -126,6 +193,44 @@ typedef enum {
 #define TEMP_NEG_10_THRES_PLUS_X_DEGREE  0
 #endif
 
+
+#else
+
+#ifdef CONFIG_PROJECT_S4710
+#define TEMP_POS_60_THRESHOLD  61
+#define TEMP_POS_60_THRES_MINUS_X_DEGREE 60
+
+#else
+#define TEMP_POS_60_THRESHOLD  50
+#define TEMP_POS_60_THRES_MINUS_X_DEGREE 47
+#endif
+
+#define TEMP_POS_45_THRESHOLD  45
+#define TEMP_POS_45_THRES_MINUS_X_DEGREE 39
+
+#define TEMP_POS_10_THRESHOLD  10
+#define TEMP_POS_10_THRES_PLUS_X_DEGREE 16
+
+#ifdef CONFIG_PROJECT_S4710
+#define TEMP_POS_0_THRESHOLD  0
+#define TEMP_POS_0_THRES_PLUS_X_DEGREE 2
+#else
+#define TEMP_POS_0_THRESHOLD  0
+#define TEMP_POS_0_THRES_PLUS_X_DEGREE 6
+#endif
+
+#ifdef CONFIG_MTK_FAN5405_SUPPORT
+#define TEMP_NEG_10_THRESHOLD  0
+#define TEMP_NEG_10_THRES_PLUS_X_DEGREE  0
+#elif defined(CONFIG_MTK_BQ24158_SUPPORT)
+#define TEMP_NEG_10_THRESHOLD  0
+#define TEMP_NEG_10_THRES_PLUS_X_DEGREE  0
+#else
+#define TEMP_NEG_10_THRESHOLD  0
+#define TEMP_NEG_10_THRES_PLUS_X_DEGREE  0
+#endif
+
+#endif
 /*****************************************************************************
  *  Normal battery temperature state
  ****************************************************************************/

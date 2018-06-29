@@ -70,10 +70,102 @@ static const char longname[] = "Gadget Android";
 #define PRODUCT_ID		0x0001
 
 /* Default manufacturer and product string , overridden by userspace */
+#if defined(PROJECT_RIO_LITE_2)
+#define MANUFACTURER_STRING "MyPhone"
+#define PRODUCT_STRING "MyPhone Rio 2 Lite"
+
+#elif defined(PROJECT_RIO_2)
+#define MANUFACTURER_STRING "MyPhone"
+#define PRODUCT_STRING "MyPhone Rio 2"
+
+#elif defined(PROJECT_RIO_2_FUN)
+#define MANUFACTURER_STRING "MyPhone"
+#define PRODUCT_STRING "MyPhone Rio 2 Fun"
+
+#elif defined(CONFIG_PROJECT_S4710_MMX)
+#define MANUFACTURER_STRING "Micromax"
+#define PRODUCT_STRING "Q372"
+
+#elif defined(CONFIG_PROJECT_S4700_MMX_IN)
+#define MANUFACTURER_STRING "Micromax"
+#define PRODUCT_STRING "A106"
+
+#elif defined(CONFIG_PROJECT_S5301_MMX_IN)
+#define MANUFACTURER_STRING "Micromax"
+#define PRODUCT_STRING "Q355"
+
+#elif defined(CONFIG_PROJECT_S5222_MMX_IN)
+#define MANUFACTURER_STRING "Micromax"
+#define PRODUCT_STRING "Q340"
+
+#elif defined(CONFIG_PROJECT_S5400_MMX_IN)
+#define MANUFACTURER_STRING "Micromax"
+#define PRODUCT_STRING "Q345"
+
+#elif defined(CONFIG_PROJECT_S4710_PK)
+#define MANUFACTURER_STRING "QMobile"
+#define PRODUCT_STRING "QMobile i8"
+
+#elif defined(CONFIG_PROJECT_S4800_PK)
+#define MANUFACTURER_STRING "QMobile"
+#define PRODUCT_STRING "QMobile S5"
+
+#elif defined(CONFIG_PROJECT_S5222_PK)
+#define MANUFACTURER_STRING "QMobile"
+#define PRODUCT_STRING "QMobile S1"
+
+#elif defined(CONFIG_PROJECT_S5400_WIK_FR)
+#define MANUFACTURER_STRING "RAINBOW UP"
+#define PRODUCT_STRING "RAINBOW UP"
+
+#elif defined(CONFIG_PROJECT_S5400_WIK_VN)
+#define MANUFACTURER_STRING "RAINBOW UP"
+#define PRODUCT_STRING "RAINBOW UP"
+
+#elif defined(CONFIG_PROJECT_S5222_WIK_FR)
+#define MANUFACTURER_STRING "RAINBOW LITE"
+#define PRODUCT_STRING "RAINBOW LITE"
+
+#elif defined(CONFIG_PROJECT_S4800_WIK_FR)
+#define MANUFACTURER_STRING "SELFY"
+#define PRODUCT_STRING "SELFY"
+
+#elif defined(CONFIG_PROJECT_S5501_WIK_FR)
+#define MANUFACTURER_STRING "RAINBOW"
+#define PRODUCT_STRING "RAINBOW"
+
+#elif defined(CONFIG_PROJECT_S5400_WIK_ID)
+#define MANUFACTURER_STRING "RAINBOW UP"
+#define PRODUCT_STRING "RAINBOW UP"
+
+#elif defined(CONFIG_PROJECT_S8813_CAS_TR)
+#define MANUFACTURER_STRING "Casper VIA"
+#define PRODUCT_STRING "Casper VIA V5"
+
+#elif defined(CONFIG_PROJECT_S5400_CAS_TR)
+#define MANUFACTURER_STRING "Casper VIA"
+#define PRODUCT_STRING "Casper VIA V3"
+
+#elif defined(CONFIG_PROJECT_S5400AP_PK)
+#define MANUFACTURER_STRING "QMobile"
+#define PRODUCT_STRING "QMobile L15"
+
+#elif defined(CONFIG_PROJECT_S4710_WIK_VN)
+#define MANUFACTURER_STRING "BLOOM2"
+#define PRODUCT_STRING "BLOOM2"
+
+#elif defined(CONFIG_PROJECT_S4710_WIK_ID)
+#define MANUFACTURER_STRING "BLOOM2"
+#define PRODUCT_STRING "BLOOM2"
+
+#elif defined(PROJECT_RIO_PIXIE)
+#define MANUFACTURER_STRING "MyPhone"
+#define PRODUCT_STRING "MyPhone Rio Pixie"
+
+#else
 #define MANUFACTURER_STRING "MediaTek"
 #define PRODUCT_STRING "MT65xx Android Phone"
-
-
+#endif
 //#define USB_LOG "USB"
 
 struct android_usb_function {

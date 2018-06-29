@@ -318,11 +318,31 @@ static struct usb_descriptor_header *ss_ptp_descs[] = {
 	NULL,
 };
 
+#if defined(CONFIG_PROJECT_S4710_PK)
+static struct usb_string mtp_string_defs[] = {
+	/* Naming interface "MTP" so libmtp will recognize us */
+	[INTERFACE_STRING_INDEX].s	= "QMobile i8",
+	{  },	/* end of list */
+};
+#elif defined(CONFIG_PROJECT_S4800_PK)
+static struct usb_string mtp_string_defs[] = {
+	/* Naming interface "MTP" so libmtp will recognize us */
+	[INTERFACE_STRING_INDEX].s	= "QMobile S5",
+	{  },	/* end of list */
+};
+#elif defined(CONFIG_PROJECT_S5222_PK)
+static struct usb_string mtp_string_defs[] = {
+	/* Naming interface "MTP" so libmtp will recognize us */
+	[INTERFACE_STRING_INDEX].s	= "QMobile S1",
+	{  },	/* end of list */
+};
+#else
 static struct usb_string mtp_string_defs[] = {
 	/* Naming interface "MTP" so libmtp will recognize us */
 	[INTERFACE_STRING_INDEX].s	= "MTP",
 	{  },	/* end of list */
 };
+#endif
 
 static struct usb_gadget_strings mtp_string_table = {
 	.language		= 0x0409,	/* en-US */

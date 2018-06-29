@@ -1657,3 +1657,10 @@ config MTK_EXTMEM
 	   depends on MTK_INTERNAL
 	   default n
 
+#
+# Added By Manjot Sidhu 29/06/2018
+#
+config PROJECT_S5222
+	bool "PROJECT_S5222"
+	default n
+
