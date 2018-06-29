@@ -1658,6 +1658,17 @@ config MTK_EXTMEM
 	   default n
 
 #
+# Hall ic
+#
+config MTK_HALL_SUPPORT
+	bool "Hall support"
+	default n
+
+config MTK_HALL_BU5203
+	bool "Hall BU5203"
+	default n
+
+#
 # Added By Manjot Sidhu 29/06/2018
 #
 config PROJECT_S5222

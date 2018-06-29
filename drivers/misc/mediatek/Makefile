@@ -16,6 +16,10 @@ ifneq ($(CONFIG_MTK_GIC),y)
 obj-y   += irq/
 endif
 
+ifeq ($(CONFIG_MTK_HALL_SUPPORT),y)
+obj-y	+= hall/
+endif
+
 obj-$(CONFIG_MTK_LASTPC)	    += lastpc/
 obj-$(CONFIG_MTK_DBG_DUMP) += dbg_dump/
 
