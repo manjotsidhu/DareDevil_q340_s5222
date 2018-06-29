@@ -169,6 +169,7 @@ typedef enum
 #define FLASH_IOC_IS_OTG_USE _IOR(FLASHLIGHT_MAGIC, 200, int)
 #define FLASH_IOC_GET_FLASH_DRIVER_NAME_ID _IOR(FLASHLIGHT_MAGIC, 205, int)
 
+#define FLASH_IOC_SUB_PRE_ON           	_IOR(FLASHLIGHT_MAGIC, 210, int)  
 
 
 typedef struct

@@ -1,10 +1,9 @@
+
 include $(srctree)/drivers/misc/mediatek/Makefile.custom
 
 # Module project related part
 
-
 ifeq ($(CONFIG_MTK_SENSOR_SUPPORT),y)
-
 ifeq ($(CONFIG_MTK_CM36283),y)
 obj-y	+=  alsps/cm36283/
 endif
@@ -50,13 +49,8 @@ obj-y	+= dct/dct/
 endif
 
 obj-y   +=  lcm/
-# obj-y	+=  camera/camera/
-obj-y	+=  imgsensor/gc0310_mipi_yuv/
-obj-y	+=  imgsensor/ov2680_mipi_raw_cmk/
-obj-y	+=  imgsensor/ov2680_mipi_raw_sunwin/
-obj-y	+=  imgsensor/ov5648_mipi_raw_darling/
-obj-y	+=  imgsensor/ov5648_mipi_raw_darling/
-obj-y	+=  imgsensor/ov5670_mipi_raw/
+obj-y   +=  flashlight/
+obj-y	+=  camera/camera/
 obj-y	+=  vibrator/
 obj-y	+=  leds/
 obj-y	+=  keypad/

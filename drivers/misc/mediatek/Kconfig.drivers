@@ -1518,6 +1518,10 @@ config MTK_LENS_DUMMYLENS_SUPPORT
 	bool "Dummy Lens Driver"
 	default n
 
+config MTK_LENS_OV5648AF_SUNWIN_SUPPORT
+	bool "OV5648AF_SUNWIN Lens Driver"
+	default n
+
 config MTK_LENS_AD5820AF_SUPPORT
 	bool "AD5820AF Lens Driver"
 	default n

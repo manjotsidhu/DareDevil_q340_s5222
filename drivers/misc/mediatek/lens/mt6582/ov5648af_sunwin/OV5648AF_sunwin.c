@@ -17,7 +17,7 @@
 #define LENS_I2C_BUSNUM 1
 static struct i2c_board_info __initdata kd_lens_dev={ I2C_BOARD_INFO("OV5648AF_SUNWIN", 0x19)};
 
-
+#define AF_DLC_MODE
 #define OV5648AF_SUNWIN_DRVNAME "OV5648AF_SUNWIN"
 #define OV5648AF_SUNWIN_VCM_WRITE_ID           0x18
 
@@ -242,7 +242,7 @@ unsigned long a_u4Param)
 static int OV5648AF_SUNWIN_Open(struct inode * a_pstInode, struct file * a_pstFile)
 {
     OV5648AF_SUNWINDB("[OV5648AF_SUNWIN] OV5648AF_SUNWIN_Open - Start\n");
-
+    long i4RetValue = 0;
     spin_lock(&g_OV5648AF_SUNWIN_SpinLock);
 
     if(g_s4OV5648AF_SUNWIN_Opened)
@@ -255,6 +255,44 @@ static int OV5648AF_SUNWIN_Open(struct inode * a_pstInode, struct file * a_pstFi
     g_s4OV5648AF_SUNWIN_Opened = 1;
 		
     spin_unlock(&g_OV5648AF_SUNWIN_SpinLock);
+    
+    #ifdef AF_DLC_MODE
+    /*char puSuspendCmd[2] = {(char)(0xEC), (char)(0xA3)};
+    i4RetValue = i2c_master_send(g_pstFM50AF_I2Cclient, puSuspendCmd, 2);
+
+    char puSuspendCmd2[2] = {(char)(0xA1), (char)(0x05)};//0x0D
+    i4RetValue = i2c_master_send(g_pstFM50AF_I2Cclient, puSuspendCmd2, 2);
+
+    char puSuspendCmd3[2] = {(char)(0xF2), (char)(0xF8)};//0xE8
+    i4RetValue = i2c_master_send(g_pstFM50AF_I2Cclient, puSuspendCmd3, 2);
+
+    char puSuspendCmd4[2] = {(char)(0xDC), (char)(0x51)};
+    i4RetValue = i2c_master_send(g_pstFM50AF_I2Cclient, puSuspendCmd4, 2);*/
+
+    char puSuspendCmd[2] = {(char)(0xEC), (char)(0xA3)};
+    i4RetValue = i2c_master_send(g_pstOV5648AF_SUNWIN_I2Cclient, puSuspendCmd, 2);
+
+    char puSuspendCmd1[2] = {(char)(0xA1), (char)(0x0D)};
+    i4RetValue = i2c_master_send(g_pstOV5648AF_SUNWIN_I2Cclient, puSuspendCmd1, 2);
+
+    char puSuspendCmd2[2] = {(char)(0xF2), (char)(0xE8)};
+    i4RetValue = i2c_master_send(g_pstOV5648AF_SUNWIN_I2Cclient, puSuspendCmd2, 2);
+
+    char puSuspendCmd3[2] = {(char)(0xDC), (char)(0x51)};
+    i4RetValue = i2c_master_send(g_pstOV5648AF_SUNWIN_I2Cclient, puSuspendCmd3, 2);
+
+    #else //AF_LSC_MODE
+
+    char puSuspendCmd[2] = {(char)(0xEC), (char)(0xA3)};
+    i4RetValue = i2c_master_send(g_pstOV5648AF_SUNWIN_I2Cclient, puSuspendCmd, 2);
+
+    char puSuspendCmd1[2] = {(char)(0xF2), (char)(0x80)};
+    i4RetValue = i2c_master_send(g_pstOV5648AF_SUNWIN_I2Cclient, puSuspendCmd1, 2);
+
+    char puSuspendCmd2[2] = {(char)(0xDC), (char)(0x51)};
+    i4RetValue = i2c_master_send(g_pstOV5648AF_SUNWIN_I2Cclient, puSuspendCmd2, 2);
+ 
+    #endif
 
     OV5648AF_SUNWINDB("[OV5648AF_SUNWIN] OV5648AF_SUNWIN_Open - End\n");
 
@@ -339,7 +377,7 @@ inline static int Register_OV5648AF_SUNWIN_CharDrv(void)
         return -EAGAIN;
     }
 
-    actuator_class = class_create(THIS_MODULE, "actuatordrv3");
+    actuator_class = class_create(THIS_MODULE, "actuatordrv7");
     if (IS_ERR(actuator_class)) {
         int ret = PTR_ERR(actuator_class);
         OV5648AF_SUNWINDB("Unable to create class, err = %d\n", ret);
@@ -452,20 +490,20 @@ static struct platform_driver g_stOV5648AF_SUNWIN_Driver = {
     .suspend	= OV5648AF_SUNWIN_suspend,
     .resume	= OV5648AF_SUNWIN_resume,
     .driver		= {
-        .name	= "lens_actuator3",
+        .name	= "lens_actuator7",
         .owner	= THIS_MODULE,
     }
 };
 
-static struct platform_device actuator_dev3 = {
-	.name		  = "lens_actuator3",
+static struct platform_device actuator_dev7 = {
+	.name		  = "lens_actuator7",
 	.id		  = -1,
 };
 
 static int __init OV5648AF_SUNWIN_i2C_init(void)
 {
     i2c_register_board_info(LENS_I2C_BUSNUM, &kd_lens_dev, 1);
-    platform_device_register(&actuator_dev3);
+    platform_device_register(&actuator_dev7);
 	
     if(platform_driver_register(&g_stOV5648AF_SUNWIN_Driver)){
         OV5648AF_SUNWINDB("failed to register OV5648AF_SUNWIN driver\n");
