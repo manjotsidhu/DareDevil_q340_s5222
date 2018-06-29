@@ -51,6 +51,12 @@ endif
 
 obj-y   +=  lcm/
 # obj-y	+=  camera/camera/
+obj-y	+=  imgsensor/gc0310_mipi_yuv/
+obj-y	+=  imgsensor/ov2680_mipi_raw_cmk/
+obj-y	+=  imgsensor/ov2680_mipi_raw_sunwin/
+obj-y	+=  imgsensor/ov5648_mipi_raw_darling/
+obj-y	+=  imgsensor/ov5648_mipi_raw_darling/
+obj-y	+=  imgsensor/ov5670_mipi_raw/
 obj-y	+=  vibrator/
 obj-y	+=  leds/
 obj-y	+=  keypad/
