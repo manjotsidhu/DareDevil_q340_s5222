@@ -969,6 +969,10 @@ config MTK_AUDIO_EXTCODEC_SUPPORT
 config MTK_AP3220
 	bool "MTK_AP3220 for MediaTek package"
 	default n
+
+config MTK_STK3308
+	bool "MTK_STK3308 for MediaTek package"
+	default n
 		
 # Accelerometer sensor
 config MTK_BMA222E_AUTO

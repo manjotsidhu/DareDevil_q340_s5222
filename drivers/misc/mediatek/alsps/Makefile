@@ -8,3 +8,7 @@ obj-y   +=  aal_control.o
 ifeq ($(CONFIG_MTK_AP3220),y)
 obj-y	+=  ap3220/
 endif
+
+ifeq ($(CONFIG_MTK_STK3308),y)
+obj-y   +=  stk3308/
+endif

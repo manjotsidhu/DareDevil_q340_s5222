@@ -20,7 +20,7 @@ static int alsps_factory_release(struct inode *inode, struct file *file)
 
 static long alsps_factory_unlocked_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 {
-    //void __user *data;
+    void __user *data;
     long err = 0;
 	struct alsps_context *cxt = alsps_context_obj;
 	void __user *ptr = (void __user*) arg;
