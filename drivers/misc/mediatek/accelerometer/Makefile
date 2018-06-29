@@ -4,6 +4,10 @@ include $(srctree)/drivers/misc/mediatek/Makefile.custom
 obj-y   +=  accel.o accel_factory.o
 
 # Accelerometer device related drivers
+ifeq ($(CONFIG_MTK_BMA222E_NEW),y)
+obj-y   +=  bma222E-new/
+endif
+
 ifeq ($(CONFIG_MTK_BMA222E_AUTO),y)
 obj-y   +=  bma222E_auto/
 endif
