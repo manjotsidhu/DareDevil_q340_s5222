@@ -51,17 +51,17 @@ fi
 
 # User and Build Host
 export KBUILD_BUILD_USER=manjotsidhu
-export KBUILD_BUILD_HOST=GAD
+export KBUILD_BUILD_HOST=ms-magicbox
 
 
 # Read the lineage/AOSP DEFCONFIG
 $e -e "${orange} Read the defconfig file ..."
-$m a106_defconfig
+$m q340_defconfig
 
 
 # Build zImage (Thanks to Joel for the all command)
 $e -e "${orange} Building Daredevil Kernel for a106 ..."
-$m -j2 zImage
+$m -j6 zImage
 
 
 # Check if there are errors in the kernel

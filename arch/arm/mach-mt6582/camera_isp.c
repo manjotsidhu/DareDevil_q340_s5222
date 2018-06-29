@@ -41,6 +41,12 @@
 
 #include <smi_common.h>
 #include <ddp_cmdq.h>
+#if 1 //isp suspend resume patch
+#include "kd_imgsensor.h"
+#include "kd_imgsensor_define.h"
+#include "kd_camera_feature.h"
+#include "kd_imgsensor_errcode.h"
+#endif
 /*******************************************************************************
 * common type define
 ********************************************************************************/
@@ -1008,6 +1014,13 @@ typedef struct _seninf_backup_reg_t_
     UINT32                          SENINF1_NCSI2_SPARE1;     // 8644
 }_seninf_backup_reg_t_;
 
+#if 1 //isp suspend resume patch
+extern BOOL g_bEnableDriver[KDIMGSENSOR_MAX_INVOKE_DRIVERS] ;
+extern SENSOR_FUNCTION_STRUCT *g_pInvokeSensorFunc[KDIMGSENSOR_MAX_INVOKE_DRIVERS] ;
+extern char g_invokeSensorNameStr[KDIMGSENSOR_MAX_INVOKE_DRIVERS][32];
+extern CAMERA_DUAL_CAMERA_SENSOR_ENUM g_invokeSocketIdx[KDIMGSENSOR_MAX_INVOKE_DRIVERS] ;
+extern int kdCISModulePowerOn(CAMERA_DUAL_CAMERA_SENSOR_ENUM SensorIdx, char *currSensorName,BOOL On, char* mode_name);
+#endif
 static volatile _isp_backup_reg_t g_backupReg;
 static volatile _seninf_backup_reg_t_ g_SeninfBackupReg;
 static atomic_t g_imem_ref_cnt[ISP_REF_CNT_ID_MAX];
@@ -1702,7 +1715,7 @@ Bit 31:28 ? {sot_reg, eol_reg, eot_reg, sof} , reg means status record
 Bit 27:24 ?{eot, eol,eot, req}
 Bit 23 : rdy
 
-Rdy should be 1    at idle or end of tile, if not 0, 很可能是mdp 沒回rdy 
+Rdy should be 1    at idle or end of tile, if not 0, ?雈i???Omdp ?S?^rdy 
 Req  should be 0   at idle or end of tile
 
 sot_reg, eol_reg, eot_reg should be 1  at idle or end of tile
@@ -1713,7 +1726,7 @@ pix count  :  bit 15:0
 
 
 2. 0x4044 / 0x4048 status
-      It is 無須 enable, 
+      It is ?L?? enable, 
 It is clear by 0x4020[31] write or read clear,
 It has many information on it,
 You can look coda
@@ -5288,8 +5301,8 @@ EXIT:
 static MINT32 mmap_kmem(struct file *filp, struct vm_area_struct *vma)
 {
     MINT32 ret;
-    long length = 0;
-    length=(long)(vma->vm_end - vma->vm_start);
+    unsigned long length = 0;
+    length=(vma->vm_end - vma->vm_start);
 
     // check length - do not allow larger mappings than the number of  pages allocated
     if(length > RT_BUF_TBL_NPAGES * PAGE_SIZE)
@@ -5323,9 +5336,9 @@ static MINT32 mmap_kmem(struct file *filp, struct vm_area_struct *vma)
 static MINT32 ISP_mmap(struct file *pFile, struct vm_area_struct *pVma)
 {
     //LOG_DBG("+");
-	long length = 0;
+	unsigned long length = 0;
 	MUINT32 pfn=0x0;
-	length= (long)(pVma->vm_end - pVma->vm_start);
+	length= (pVma->vm_end - pVma->vm_start);
     // at offset RT_BUF_TBL_NPAGES we map the kmalloc'd area
     if(pVma->vm_pgoff == RT_BUF_TBL_NPAGES) 
     {
@@ -5719,7 +5732,11 @@ static void backRegister(void)
 	
 	//pReg = &g_backupReg.CAM_LSCI_STRIDE;
 	pReg = (MUINT32*)&g_backupReg.CAM_CTL_START;
+#if 1 //isp suspend resume patch
+    for (i= 0x274; i <= 0x284; i += 4)
+#else
 	for (i= 0x27C; i <= 0x284; i += 4)
+#endif
 	{
 		(*(pReg+(i/4))) = (UINT32)ISP_RD32(ISP_ADDR + i);
 	}  
@@ -5728,7 +5745,11 @@ static void backRegister(void)
 	
 	//pReg = &g_backupReg.CAM_IMGO_STRIDE;
 	pReg = (MUINT32*)&g_backupReg.CAM_CTL_START;
+#if 1 //isp suspend resume patch
+    for (i= 0x308; i <= 0x318; i += 4)
+#else
 	for (i= 0x310; i <= 0x318; i += 4)
+#endif
 	{
 		(*(pReg+(i/4))) = (UINT32)ISP_RD32(ISP_ADDR + i);
 	}  
@@ -5761,7 +5782,11 @@ static void backRegister(void)
 	
 	//pReg = &g_backupReg.CAM_BIN_SIZE;
 	pReg = (MUINT32*)&g_backupReg.CAM_CTL_START;
+#if 1 //isp suspend resume patch
+    for (i= 0x4F0; i <= 0x53C; i += 4)
+#else
 	for (i= 0x4F0; i <= 0x538; i += 4)
+#endif
 	{
 		(*(pReg+(i/4))) = (UINT32)ISP_RD32(ISP_ADDR + i);
 	} 
@@ -6011,8 +6036,13 @@ static void restoreRegister(void)
 
 	ISP_WR32(0xF500426c, g_backupReg.CAM_LSCI_BASE_ADDR);
 	
+#if 1 //isp suspend resume patch
+    pReg = (MUINT32*)&g_backupReg.CAM_LSCI_XSIZE;
+    for (i= 0x274; i <= 0x284; i += 4)
+#else
 	pReg = (MUINT32*)&g_backupReg.CAM_LSCI_STRIDE;
 	for (i= 0x27C; i <= 0x284; i += 4)
+#endif
 	{
 		//(*pReg+i) = (UINT32)ISP_RD32(ISP_ADDR + i);
 		ISP_WR32((ISP_ADDR + i), (MUINT32)(*(pReg)));
@@ -6021,8 +6051,13 @@ static void restoreRegister(void)
 	
 	ISP_WR32(0xF5004300, g_backupReg.CAM_IMGO_BASE_ADDR);
 	
+#if 1 //isp suspend resume patch
+    pReg = (MUINT32*)&g_backupReg.CAM_IMGO_XSIZE;
+    for (i= 0x308; i <= 0x318; i += 4)
+#else
 	pReg = (MUINT32*)&g_backupReg.CAM_IMGO_STRIDE;
 	for (i= 0x310; i <= 0x318; i += 4)
+#endif
 	{
 		//(*pReg+i) = (UINT32)ISP_RD32(ISP_ADDR + i);
 		ISP_WR32((ISP_ADDR + i), (MUINT32)(*(pReg)));
@@ -6058,7 +6093,11 @@ static void restoreRegister(void)
 	} 
 	
 	pReg = (MUINT32*)&g_backupReg.CAM_BIN_SIZE;
+#if 1 //isp suspend resume patch
+    for (i= 0x4F0; i <= 0x53C; i += 4)
+#else
 	for (i= 0x4F0; i <= 0x538; i += 4)
+#endif
 	{
 		//(*pReg+i) = (UINT32)ISP_RD32(ISP_ADDR + i);
 		ISP_WR32((ISP_ADDR + i), (MUINT32)(*(pReg)));
@@ -6261,12 +6300,80 @@ static void restoreRegister(void)
 	
 
 }
+#if 1 //isp suspend resume patch
+#define CAMERA_HW_DRVNAME1  "kd_camera_hw"
+
+static void sensorPowerOn()
+{
+	MUINT32 ret = ERROR_NONE;
+	MINT32 i = 0;
+    MSDK_SENSOR_EXPOSURE_WINDOW_STRUCT imageWindow;
+    MSDK_SENSOR_CONFIG_STRUCT sensorConfigData;
+    memset(&imageWindow, 0, sizeof(ACDK_SENSOR_EXPOSURE_WINDOW_STRUCT));
+    memset(&sensorConfigData, 0, sizeof(ACDK_SENSOR_CONFIG_STRUCT));
+
+	for ( i = (KDIMGSENSOR_MAX_INVOKE_DRIVERS-1) ; i >= KDIMGSENSOR_INVOKE_DRIVER_0 ; i-- ) {
+		if ( g_bEnableDriver[i] && g_pInvokeSensorFunc[i] ) {
+			// turn on power
+			ret = kdCISModulePowerOn((CAMERA_DUAL_CAMERA_SENSOR_ENUM)g_invokeSocketIdx[i],(char*)g_invokeSensorNameStr[i],true,CAMERA_HW_DRVNAME1);
+			if ( ERROR_NONE != ret ) {
+				LOG_ERR("[%s] err(%d)",__FUNCTION__, ret);
+				return ret;
+			}
+			//wait for power stable
+			mDELAY(10);
+			LOG_DBG("kdModulePowerOn");
+	
+			ret = g_pInvokeSensorFunc[i]->SensorOpen();
+			if ( ERROR_NONE != ret ) {
+				kdCISModulePowerOn((CAMERA_DUAL_CAMERA_SENSOR_ENUM)g_invokeSocketIdx[i],(char*)g_invokeSensorNameStr[i],false,CAMERA_HW_DRVNAME1);
+				LOG_ERR("SensorOpen: err(%d)", ret);
+				return ret;
+			}
+
+			memcpy(&imageWindow, &g_pInvokeSensorFunc[i]->imageWindow, sizeof(ACDK_SENSOR_EXPOSURE_WINDOW_STRUCT));
+			memcpy(&sensorConfigData, &g_pInvokeSensorFunc[i]->sensorConfigData, sizeof(ACDK_SENSOR_CONFIG_STRUCT));
+
+            ret = g_pInvokeSensorFunc[i]->SensorControl(g_pInvokeSensorFunc[i]->ScenarioId,&imageWindow,&sensorConfigData);
+            if ( ERROR_NONE != ret ) {
+                LOG_ERR("ERR:SensorControl(), i =%d, err(%d)\n",i, ret);
+                return ret;
+            }
+
+			//set i2c slave ID
+			//SensorOpen() will reset i2c slave ID
+			//KD_SET_I2C_SLAVE_ID(i,g_invokeSocketIdx[i],IMGSENSOR_SET_I2C_ID_FORCE);
+		}
+	}
+
+}
+
+
+static void sensorPowerOff()	
+{
+	MUINT32 ret = ERROR_NONE;
+	MINT32 i = 0;
+
+	for ( i = (KDIMGSENSOR_MAX_INVOKE_DRIVERS-1) ; i >= KDIMGSENSOR_INVOKE_DRIVER_0 ; i-- ) {
+		if ( g_bEnableDriver[i] && g_pInvokeSensorFunc[i] ) {
+			// turn off power
+			ret = kdCISModulePowerOn((CAMERA_DUAL_CAMERA_SENSOR_ENUM)g_invokeSocketIdx[i],(char*)g_invokeSensorNameStr[i],false,CAMERA_HW_DRVNAME1);
+			if ( ERROR_NONE != ret ) {
+				LOG_ERR("[%s] err(%d)",__FUNCTION__, ret);
+				return ret;
+			}
+		}
+	}
+
+}
+#endif
+static MUINT32 regTG1Val;
 static MINT32 ISP_suspend(struct platform_device *pDev,pm_message_t Mesg)
 {
     // TG_VF_CON[0] (0x15004414[0]): VFDATA_EN. TG1 Take Picture Request.
     ISP_WAIT_IRQ_STRUCT waitirq;
     MINT32 ret = 0;
-    MUINT32 regTG1Val = ISP_RD32((void *)(ISP_ADDR + 0x414));
+    regTG1Val = ISP_RD32((void *)(ISP_ADDR + 0x414));
 
     LOG_DBG("g_bPass1_On_In_Resume_TG1(%d),regTG1Val(0x%08x)", g_bPass1_On_In_Resume_TG1, regTG1Val);
 
@@ -6278,9 +6385,13 @@ static MINT32 ISP_suspend(struct platform_device *pDev,pm_message_t Mesg)
         //wait p1 done
         waitirq.Clear=ISP_IRQ_CLEAR_WAIT;
         waitirq.Type=ISP_IRQ_TYPE_INT;
-        waitirq.Status=ISP_IRQ_INT_STATUS_PASS1_TG1_DON_ST;
+        waitirq.Status=ISP_IRQ_INT_STATUS_VS1_ST;//ISP_IRQ_INT_STATUS_PASS1_TG1_DON_ST;
         waitirq.Timeout=100;
         ret=ISP_WaitIrq(waitirq);
+        #if 1 //isp suspend resume patch
+		sensorPowerOff();
+        LOG_DBG("sensor power off");
+        #endif
 
         backRegister();
  
@@ -6297,7 +6408,7 @@ static MINT32 ISP_suspend(struct platform_device *pDev,pm_message_t Mesg)
 static MINT32 ISP_resume(struct platform_device *pDev)
 {
     // TG_VF_CON[0] (0x15004414[0]): VFDATA_EN. TG1 Take Picture Request.
-    MUINT32 regTG1Val = ISP_RD32((void *)(ISP_ADDR + 0x414));
+    //MUINT32 regTG1Val = ISP_RD32((void *)(ISP_ADDR + 0x414));
 
     LOG_DBG("g_bPass1_On_In_Resume_TG1(%d),regTG1Val(0x%x)", g_bPass1_On_In_Resume_TG1, regTG1Val);
 
@@ -6305,6 +6416,10 @@ static MINT32 ISP_resume(struct platform_device *pDev)
     {
         ISP_EnableClock(MTRUE);
         restoreRegister();
+        #if 1 //isp suspend resume patch
+        LOG_DBG("sensor power on");
+        sensorPowerOn();
+        #endif
         g_bPass1_On_In_Resume_TG1  = 0;
         ISP_WR32((void *)(ISP_ADDR + 0x414), (regTG1Val|0x01) );  // For TG1 Main sensor.
     }
