@@ -1,3 +1,4 @@
+
 // LVDSTX(Base Address:+800h/+900h)
 // 1.Basic setting
 #define LVDS_OUTPUT_CTRL   0x0818
@@ -354,3 +355,7 @@ typedef enum
   #define RG_PLL1_MONCKEN    0x00000100  //[8]PLL1 clock monitor enable
   #define RG_PLL1_VODEN      0x00000080  //[7]CHP OverDrive Enable
   #define RG_NFIPLL_EN       0x00000002  //[1]Power Down 0: Power down 1: Power on
+  
+#define REG_PLL_GPANACFG2              0x1354
+#define PLLGP_ANACFG2_PLLGP_BIAS_EN       (1U<<20)
+  
